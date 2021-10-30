@@ -19,59 +19,63 @@ _INPUT = """\
 2 9 10
 2 3 3
 2 7 13
+2 2 1
+2 3
+3 2 5
 """
 
 sys.stdin = io.StringIO(_INPUT)
 case_no=int(input())
 for __ in range(case_no):
-    from bisect import bisect_left,bisect_right
-    D,L,N=map(int,input().split())
-    C=list(map(int,input().split()))
-    C=[C[i]-1 for i in range(D)]
-    # ダブリングの前処理
-    tmp=[[] for _ in range(10**5)]
-    for i in range(D):
-        tmp[C[i]].append(i)
-    # print(tmp[:5])
-    doubling=[[] for i in range(D)]
-    for i in range(10**5):
-        for j in range(len(tmp[i])):
-            x=tmp[i][j] #今の元の位置
-            y=tmp[i][(j+1)%len(tmp[i])] #次の元の位置
-            if x==y: t=(D-1)//L
-            else: t=((y-x)%D-1)//L #tは次にCiを食べるまでに料理を食べる回数
-            # if t==-1: print(y,x,tmp[i],L)
-            doubling[x].append([y,t+1])
-    # print(tmp[:5],doubling)
-    for i in range(30):
-        for j in range(D):
-            x,y=doubling[j][i]
-            doubling[j].append([doubling[x][i][0],y+doubling[x][i][1]])
-    l=[[doubling[cur][i][1] for i in range(31)] for cur in range(D)]
-    # print(doubling[:5])
-    for _ in range(N):
-        K,F,T=map(int,input().split())
-        K-=1; F-=1; T-=1
-        ans=0
-        if C[F]==K: ans+=1
-        # print(ans,T,__,_)
-        if tmp[K]==[]: ans=0
+from bisect import bisect_left,bisect_right
+D,L,N=map(int,input().split())
+C=list(map(int,input().split()))
+C=[C[i]-1 for i in range(D)]
+# ダブリングの前処理
+tmp=[[] for _ in range(10**5)]
+for i in range(D):
+    tmp[C[i]].append(i)
+# print(tmp[:5])
+doubling=[[] for i in range(D)]
+for i in range(10**5):
+    for j in range(len(tmp[i])):
+        x=tmp[i][j] #今の元の位置
+        y=tmp[i][(j+1)%len(tmp[i])] #次の元の位置
+        if x==y: t=(D-1)//L
+        else: t=((y-x)%D-1)//L #tは次にCiを食べるまでに料理を食べる回数
+        # if t==-1: print(y,x,tmp[i],L)
+        doubling[x].append([y,t+1])
+# print(tmp[:5],doubling)
+for i in range(30):
+    for j in range(D):
+        x,y=doubling[j][i]
+        doubling[j].append([doubling[x][i][0],y+doubling[x][i][1]])
+l=[[doubling[cur][i][1] for i in range(31)] for cur in range(D)]
+# print(doubling[:5])
+for _ in range(N):
+    K,F,T=map(int,input().split())
+    K-=1; F-=1; T-=1
+    ans=0
+    # print(C,F)
+    if C[F]==K: ans+=1
+    # print(ans,T,__,_)
+    if tmp[K]==[]: ans=0
+    else:
+        x=bisect_right(tmp[K],F)
+        if x==len(tmp[K]): x=0
+        # print(tmp[K])
+        if tmp[K][x]!=F: T-=((tmp[K][x]-F)%D-1)//L #最初にKにたどり着くまでに食堂を利用する回数分引く
+        if T<=0: pass
         else:
-            x=bisect_right(tmp[K],F)
-            if x==len(tmp[K]): x=0
-            # print(tmp[K])
-            T-=((tmp[K][x]-F)%D-1)//L #最初にKにたどり着くまでに食堂を利用する回数分引く
-            # print(ans,T,__,_)
-            if T<=0: pass
-            else:
+            if tmp[K][x]!=F:
                 ans+=1
                 T-=1
-                cur=tmp[K][x]
-                while T>0:
-                    a=bisect_right(l[cur],T)
-                    if a>0:
-                        ans+=pow(2,a-1)
-                        T-=l[cur][a-1]
-                        cur=doubling[cur][a-1][0]
-                    else: T=0
-        print(ans)
+            cur=tmp[K][x]
+            while T>0:
+                a=bisect_right(l[cur],T)
+                if a>0:
+                    ans+=pow(2,a-1)
+                    T-=l[cur][a-1]
+                    cur=doubling[cur][a-1][0]
+                else: T=0
+    print(ans)

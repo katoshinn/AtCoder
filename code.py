@@ -4,9 +4,9 @@ import io
 import sys
 
 #ABCの回数
-times="234"
+times=""
 #問題
-problem="a"
+problem=""
 
  # 1. Get a html.
 with urlopen("https://atcoder.jp/contests/abc{0}/tasks/abc{0}_{1}".format(times, problem)) as res:

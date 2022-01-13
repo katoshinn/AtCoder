@@ -4,7 +4,7 @@ import io
 import sys
 
 #ABCの回数
-times=234
+times="234"
 #問題
 problem="a"
 
@@ -14,14 +14,14 @@ with urlopen("https://atcoder.jp/contests/abc{0}/tasks/abc{0}_{1}".format(times,
 # 2. Load a html by BeautifulSoup.
 soup = BeautifulSoup(html, "html.parser")
 # 3. Get items you want.
-titles = soup.select(".lang-ja pre")
-titles =[t.text for t in titles[1:]]
+test_case = soup.select(".lang-ja pre")
+test_case =[t.text for t in test_case[1:]]
 
-for __ in range(0,len(titles),2):
-  sys.stdin = io.StringIO(titles[__])
+for __ in range(0,len(test_case),2):
+  sys.stdin = io.StringIO(test_case[__])
 
   """ここから下にコードを記述"""
   
   """ここから上にコードを記述"""
 
-  print(titles[__+1])
+  print(test_case[__+1])

@@ -5,7 +5,7 @@ import os
 import shutil
 import textfile
  
-dir_path = 'C:/Users/加藤真也/OneDrive/デスクトップ/ABC{}'.format(times)
+dir_path = 'C:/Users/katonyonko/OneDrive/デスクトップ/ABC{}'.format(times)
 os.mkdir(dir_path)
 problems = ["a", "b", "c", "d"]
 if int(times) > 125:

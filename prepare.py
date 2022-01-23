@@ -1,5 +1,5 @@
 #以下に設定するABCの回数を指定する
-times = "234"
+times = "235"
 
 import os
 import shutil
@@ -15,4 +15,4 @@ if int(times) > 211:
 for i in range(len(problems)):
   shutil.copy('./code.py', dir_path+'/ABC'+times+'_'+problems[i].upper()+'.py')
   textfile.replace(dir_path+'/ABC'+times+'_'+problems[i].upper()+'.py', 'times=""', 'times="{}"'.format(times))
-  textfile.replace(dir_path+'/ABC'+times+'_'+problems[i].upper()+'.py', 'problem=""', 'times="{}"'.format(problems[i]))
+  textfile.replace(dir_path+'/ABC'+times+'_'+problems[i].upper()+'.py', 'problem=""', 'problem="{}"'.format(problems[i]))

@@ -329,6 +329,7 @@ class BIT:
         while p <= self._n:
             self.data[p - 1] += x
             p += p & -p
+    #合計にはrを含む
     def sum(self, l, r):
         assert 0 <= l <= r <= self._n
         return self._sum(r) - self._sum(l)

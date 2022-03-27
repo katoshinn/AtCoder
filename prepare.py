@@ -1,12 +1,22 @@
 #以下に設定するABCの回数を指定する
+<<<<<<< HEAD
 times = "070"
+=======
+times = "076"
+>>>>>>> 7246b8835d87ac495a39cd5ef771462fcc6e5f08
 
 import os
 import shutil
 import textfile
+<<<<<<< HEAD
  
 real_time='No'
 dir_path = 'C:/Users/katonyonko/OneDrive/デスクトップ/ABC{}'.format(times)
+=======
+
+real_time='Yes'
+dir_path = 'C:\\Users\\shinykato\\ABC{}'.format(times)
+>>>>>>> 7246b8835d87ac495a39cd5ef771462fcc6e5f08
 os.mkdir(dir_path)
 problems = ["a", "b", "c", "d"]
 if int(times) > 125:

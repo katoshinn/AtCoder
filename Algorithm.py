@@ -506,7 +506,7 @@ def Popcount(n):
 #aとbが互いに素な時、xはmod bにおいてのaの逆元
 def ExtGCD(a, b):
     if b:
-        g, y, x = extgcd(b, a % b)
+        g, y, x = ExtGCD(b, a % b)
         y -= (a // b)*x
         return g, x, y
     return a, 1, 0

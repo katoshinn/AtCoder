@@ -366,7 +366,7 @@ def Dijkstra(G,s):
 #ワーシャルフロイド
 https://atcoder.jp/contests/abc208/submissions/23996146
 
-#オイラーツアー
+#オイラーツアー(https://maspypy.com/euler-tour-%E3%81%AE%E3%81%8A%E5%8B%89%E5%BC%B7#toc4)
 def EulerTour(G, s):
     depth=[-1]*len(G)
     depth[s]=0
@@ -374,12 +374,11 @@ def EulerTour(G, s):
     Q = [~s, s] # 根をスタックに追加
     parent=[-1]*len(G)
     ET = []
-    left=[-1]*len(G)
+    left,right=[-1]*len(G),[-1]*len(G)
     while Q:
         i = Q.pop()
         if i >= 0: # 行きがけの処理
             done[i] = 1
-            if left[i]==-1: left[i]=len(ET)
             ET.append(i)
             for a in G[i][::-1]:
                 if done[a]: continue
@@ -388,8 +387,11 @@ def EulerTour(G, s):
                 Q.append(~a) # 帰りがけの処理をスタックに追加
                 Q.append(a) # 行きがけの処理をスタックに追加
         else: # 帰りがけの処理
-            ET.append(parent[~i])
-    return ET[:-1], left, depth, parent
+            ET.append(i)
+    for i in range(len(G)*2):
+      if ET[i]>=0 and left[ET[i]]==-1: left[ET[i]]=i
+      if ET[~i]<0 and right[~ET[~i]]==-1: right[~ET[~i]]=len(G)*2-i-1
+    return ET, left, right, depth, parent #(right-left+1)//2がその頂点を含む部分木の大きさ
 
 #LCA(最小共通祖先)ここは準備
 S,F,depth,parent=EulerTour(G,0)

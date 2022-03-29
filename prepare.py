@@ -1,11 +1,11 @@
 #以下に設定するABCの回数を指定する
-times = "076"
+times = "067"
 
 import os
 import shutil
 import textfile
 
-real_time='Yes'
+real_time='No'
 dir_path = 'C:\\Users\\shinykato\\ABC{}'.format(times)
 os.mkdir(dir_path)
 problems = ["a", "b", "c", "d"]

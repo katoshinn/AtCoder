@@ -343,7 +343,7 @@ class BIT:
 #mod 3などの小さい素数でのコンビネーションの求め方
 https://atcoder.jp/contests/arc117/editorial/1113
 
-#dijkstra
+#Dijkstra
 from heapq import heappop,heappush
 def Dijkstra(G,s):
   done=[False]*len(G)
@@ -363,8 +363,15 @@ def Dijkstra(G,s):
         heappush(h,(C[v[1]],v[1]))
   return C
 
-#ワーシャルフロイド
-https://atcoder.jp/contests/abc208/submissions/23996146
+#Warshall-Floyd
+# cost[i][j]: 頂点v_iから頂点v_jへ到達するための辺コストの和
+def WF(cost):
+    for k in range(len(cost)):
+        for i in range(len(cost)):
+            for j in range(len(cost)):
+                if cost[i][k]!=INF and cost[k][j]!=INF:
+                    cost[i][j] = min(cost[i][j], cost[i][k] + cost[k][j])
+    return cost
 
 #オイラーツアー(https://maspypy.com/euler-tour-%E3%81%AE%E3%81%8A%E5%8B%89%E5%BC%B7#toc4)
 def EulerTour(G, s):
@@ -877,6 +884,26 @@ def bfs(G,s):
         dq.append(y)
   return D
 
+#01BFS Gは隣接頂点リストで、(隣接頂点,重み(0or1))が入っている
+from collections import deque
+def bfs01(G,s):
+  inf=10**20
+  dist = [inf]*len(G)
+  dist[s] = 0
+  que = deque()
+  que.append(s)
+  while que:
+    i = que.popleft()
+    for j, c in G[i]:
+        d = dist[i] + c
+        if d < dist[j]:
+            dist[j] = d
+            if c == 1:
+                que.append(j)
+            else:
+                que.appendleft(j)
+  return dist
+
 # 複数の区間が与えられた時の和集合(Xは区間のリストのリスト⇨例えばX=[[1,3],[10,12],[2,8]]なら[[1,8],[10,12]]が返る。1以上3以下か10以上12以下か2以上8以下の区間は1以上8以下か10以上12以下として表せる)
 def Union(X):
     tmp=[]
@@ -1010,3 +1037,134 @@ def dfs(G,r=0):
             cycle.pop()
             finished[x]=True
     return None
+
+#multiset
+import math
+from bisect import bisect_left, bisect_right, insort
+from typing import Generic, Iterable, Iterator, TypeVar, Union, List
+T = TypeVar('T')
+class SortedMultiset(Generic[T]):
+  BUCKET_RATIO = 50
+  REBUILD_RATIO = 170
+ 
+  def _build(self, a=None) -> None:
+      "Evenly divide `a` into buckets."
+      if a is None: a = list(self)
+      size = self.size = len(a)
+      bucket_size = int(math.ceil(math.sqrt(size / self.BUCKET_RATIO)))
+      self.a = [a[size * i // bucket_size : size * (i + 1) // bucket_size] for i in range(bucket_size)]
+ 
+  def __init__(self, a: Iterable[T] = []) -> None:
+      "Make a new SortedMultiset from iterable. / O(N) if sorted / O(N log N)"
+      a = list(a)
+      if not all(a[i] <= a[i + 1] for i in range(len(a) - 1)):
+          a = sorted(a)
+      self._build(a)
+ 
+  def __iter__(self) -> Iterator[T]:
+      for i in self.a:
+          for j in i: yield j
+ 
+  def __reversed__(self) -> Iterator[T]:
+      for i in reversed(self.a):
+          for j in reversed(i): yield j
+ 
+  def __len__(self) -> int:
+      return self.size
+ 
+  def __repr__(self) -> str:
+      return "SortedMultiset" + str(self.a)
+ 
+  def __str__(self) -> str:
+      s = str(list(self))
+      return "{" + s[1 : len(s) - 1] + "}"
+ 
+  def _find_bucket(self, x: T) -> List[T]:
+      "Find the bucket which should contain x. self must not be empty."
+      for a in self.a:
+          if x <= a[-1]: return a
+      return a
+ 
+  def __contains__(self, x: T) -> bool:
+      if self.size == 0: return False
+      a = self._find_bucket(x)
+      i = bisect_left(a, x)
+      return i != len(a) and a[i] == x
+ 
+  def count(self, x: T) -> int:
+      "Count the number of x."
+      return self.index_right(x) - self.index(x)
+ 
+  def add(self, x: T) -> None:
+      "Add an element. / O(√N)"
+      if self.size == 0:
+          self.a = [[x]]
+          self.size = 1
+          return
+      a = self._find_bucket(x)
+      insort(a, x)
+      self.size += 1
+      if len(a) > len(self.a) * self.REBUILD_RATIO:
+          self._build()
+ 
+  def discard(self, x: T) -> bool:
+      "Remove an element and return True if removed. / O(√N)"
+      if self.size == 0: return False
+      a = self._find_bucket(x)
+      i = bisect_left(a, x)
+      if i == len(a) or a[i] != x: return False
+      a.pop(i)
+      self.size -= 1
+      if len(a) == 0: self._build()
+      return True
+ 
+  def lt(self, x: T) -> Union[T, None]:
+      "Find the largest element < x, or None if it doesn't exist."
+      for a in reversed(self.a):
+          if a[0] < x:
+              return a[bisect_left(a, x) - 1]
+ 
+  def le(self, x: T) -> Union[T, None]:
+      "Find the largest element <= x, or None if it doesn't exist."
+      for a in reversed(self.a):
+          if a[0] <= x:
+              return a[bisect_right(a, x) - 1]
+ 
+  def gt(self, x: T) -> Union[T, None]:
+      "Find the smallest element > x, or None if it doesn't exist."
+      for a in self.a:
+          if a[-1] > x:
+              return a[bisect_right(a, x)]
+ 
+  def ge(self, x: T) -> Union[T, None]:
+      "Find the smallest element >= x, or None if it doesn't exist."
+      for a in self.a:
+          if a[-1] >= x:
+              return a[bisect_left(a, x)]
+ 
+  def __getitem__(self, x: int) -> T:
+      "Return the x-th element, or IndexError if it doesn't exist."
+      if x < 0: x += self.size
+      if x < 0: raise IndexError
+      for a in self.a:
+          if x < len(a): return a[x]
+          x -= len(a)
+      raise IndexError
+ 
+  def index(self, x: T) -> int:
+      "Count the number of elements < x."
+      ans = 0
+      for a in self.a:
+          if a[-1] >= x:
+              return ans + bisect_left(a, x)
+          ans += len(a)
+      return ans
+ 
+  def index_right(self, x: T) -> int:
+      "Count the number of elements <= x."
+      ans = 0
+      for a in self.a:
+          if a[-1] > x:
+              return ans + bisect_right(a, x)
+          ans += len(a)
+      return ans

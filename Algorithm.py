@@ -1166,3 +1166,26 @@ class SortedMultiset(Generic[T]):
               return ans + bisect_right(a, x)
           ans += len(a)
       return ans
+
+#BellmanFord
+def BellmanFord(G,s=0):
+    inf=10**20
+    D=[inf]*len(G)
+    D[0]=0
+    for i in range(len(G)-1):
+      for j in range(len(G)):
+        for c,v in G[j]:
+          if D[j]+c<D[v]:
+            D[v]=D[j]+c
+    cycle=[0]*len(G)
+    for j in range(len(G)):
+      for c,v in G[j]:
+        if D[j]+c<D[v]: cycle[v]=1
+    for i in range(len(G)-1):
+      for j in range(len(G)):
+        if cycle[j]==1:
+          for c,v in G[j]:
+            cycle[v]=1
+    for i in range(len(G)):
+      if cycle[i]==1: D[i]='-inf'
+    return D

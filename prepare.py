@@ -1,5 +1,5 @@
 #以下に設定するABCの回数を指定する
-times = "067"
+times = "062"
 
 import os
 import shutil

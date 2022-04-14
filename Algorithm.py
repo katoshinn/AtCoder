@@ -937,7 +937,10 @@ def Union(X):
 F=[1]
 for i in range(N):
     F.append(F[-1]*(i+1)%mod)
-I=[pow(F[i],mod-2,mod) for i in range(N+1)]
+I=[pow(F[-1],mod-2,mod)]
+for i in range(N):
+    I.append(I[-1]*(N-i)%mod)
+I=I[::-1]
 
 #行列掃き出し法(Aはリスト、Nは桁数（Aのサイズではない）で、Aの要素を2進数表示したときに上の桁から掃き出しでまとめていく関数)
 #A=[2,3]であれば、2進表示で10, 11だが、10は残して2の位の1が被っている11については10とxorを取って01に変更する。

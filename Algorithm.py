@@ -744,10 +744,10 @@ def LIS(A: list):
     L3=[]
     m=len(L)-1
     for i in range(len(A)-1,-1,-1):
-    if ID[i]==m:
-        L2.append(A[i])
-        L3.append(i)
-        m-=1
+        if ID[i]==m:
+            L2.append(A[i])
+            L3.append(i)
+            m-=1
     return len(L), L2[::-1], L3[::-1] #それぞれ最長増加部分列の長さ、復元した部分列、そのインデックス
 
 #WLIS(広義の最長増加部分列の長さと具体的な広義最長増加部分列を求める)

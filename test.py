@@ -3,36 +3,33 @@ import sys
 
 _INPUT = """\
 6
-12 4 3
-3 1
-6 5
-4 3
-10 3 4
-7 3
-3 1
-5 4
-6 3
+999 434
+255 15
+9999999999 1
 """
-
 sys.stdin = io.StringIO(_INPUT)
 case_no=int(input())
 for __ in range(case_no):
-  from heapq import heappop, heappush
-  X,F,N=map(int,input().split())
-  camel=[[0,0]]
-  for i in range(N):
-    x=list(map(int,input().split()))
-    camel.append(x)
-  camel.append([X,0])
-  camel.sort()
-  h=[]
-  nxt=F
+  from itertools import product
+  N,B=map(int,input().split())
   ans=0
-  for i in range(N+1):
-    nxt+=-camel[i+1][0]+camel[i][0]
-    while nxt<0 and len(h)>0:
-      nxt-=heappop(h)
-      ans+=1
-    if nxt<0: ans=-1; break
-    heappush(h,-camel[i+1][1])
+  factor=[0]*4
+  prime=[2,3,5,7]
+  for i in range(4):
+    p=prime[i]
+    tmp=N
+    while tmp>1:
+      factor[i]+=1
+      tmp//=p
+  iter=product(*[list(range(factor[i]+1)) for i in range(4)])
+  for v in iter:
+    f=1
+    for i in range(4):
+      f*=pow(prime[i],v[i])
+    tmp=str(B+f)
+    tmp2=1
+    for i in range(len(tmp)):
+      tmp2*=int(tmp[i])
+    if tmp2==f: ans+=1
+  if '0' in str(B): ans+=1
   print(ans)

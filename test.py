@@ -21,7 +21,6 @@ _INPUT = """\
 -852824253 182038292 292554027
 57367207 364076584 139043300
 """
-
 sys.stdin = io.StringIO(_INPUT)
 case_no=int(input())
 for __ in range(case_no):

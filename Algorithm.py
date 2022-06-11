@@ -329,7 +329,7 @@ class BIT:
         while p <= self._n:
             self.data[p - 1] += x
             p += p & -p
-    #合計にはrを含む
+    #合計にはrを含まない
     def sum(self, l, r):
         assert 0 <= l <= r <= self._n
         return self._sum(r) - self._sum(l)
@@ -401,6 +401,29 @@ def EulerTour(G, s):
     return ET, left, right, depth, parent #(right-left+1)//2がその頂点を含む部分木の大きさ
 
 #LCA(最小共通祖先)ここは準備
+def EulerTour(G, s):
+    depth=[-1]*len(G)
+    depth[s]=0
+    done = [0]*len(G)
+    Q = [~s, s] # 根をスタックに追加
+    parent=[-1]*len(G)
+    ET = []
+    left=[-1]*len(G)
+    while Q:
+        i = Q.pop()
+        if i >= 0: # 行きがけの処理
+            done[i] = 1
+            if left[i]==-1: left[i]=len(ET)
+            ET.append(i)
+            for a in G[i][::-1]:
+                if done[a]: continue
+                depth[a]=depth[i]+1
+                parent[a]=i
+                Q.append(~a) # 帰りがけの処理をスタックに追加
+                Q.append(a) # 行きがけの処理をスタックに追加
+        else: # 帰りがけの処理
+            ET.append(parent[~i])
+    return ET[:-1], left, depth, parent
 S,F,depth,parent=EulerTour(G,0)
 INF = (len(G), None)
 M = 2*len(G)

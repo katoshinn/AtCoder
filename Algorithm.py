@@ -1199,7 +1199,7 @@ class SortedMultiset(Generic[T]):
 def BellmanFord(G,s=0):
     inf=10**20
     D=[inf]*len(G)
-    D[0]=0
+    D[s]=0
     for i in range(len(G)-1):
       for j in range(len(G)):
         for c,v in G[j]:

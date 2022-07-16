@@ -1260,3 +1260,49 @@ class FordFulkerson:
             f = self.dfs(s, t, INF)
             flow += f
         return flow
+
+# 全方位木DP
+from collections import deque
+#0を根として、Pに各頂点の親を格納。
+P = [-1] * N
+Q = deque([0])
+R = []
+W = [-100] * N
+while Q:
+  i = deque.popleft(Q)
+  R.append(i)
+  for a in G[i]:
+    if a != P[i]:
+      P[a] = i
+      G[a].remove(i)
+      deque.append(Q, a)
+##### Settings
+unit = xxxx
+merge = lambda a, b: xxxxxx
+## ↓ この2つは必ず対称的にする（じゃないとバグる）
+adj_bu = lambda a, i, p: xxxxx
+adj_td = lambda a, i, p: xxxxx
+#####
+adj_fin = lambda a, i: xxxxx
+#####
+ME = [unit] * N #子からの情報を集約した値
+ans = [0] * N #親に伝搬する値
+TD = [unit] * N #累積値を格納しておくリスト
+#葉から値を集約して通常の木DPをやる部分
+for i in R[1:][::-1]:
+    p = P[i]
+    ans[i] = adj_bu(ME[i], i, p)
+    ME[p] = merge(ME[p], ans[i])
+ans[R[0]] = adj_fin(ME[R[0]], R[0])
+#親からの情報と子からの情報を統合して全方位木DPをやる部分
+for i in R:
+    ac = TD[i]
+    for j in G[i]:
+        TD[j] = ac #前から累積していった値をTDに格納
+        ac = merge(ac, ans[j]) #acを前から累積した値に更新
+    ac = unit #一度リセットして、後ろから累積していった値をacに入れる
+    for j in G[i][::-1]:
+        TD[j] = adj_td(merge(TD[j], ac), j, i) #TD[j]を親方向から伝搬させる値に更新（前から累積したTD[j]と後ろからの累積値acをマージ）
+        ac = merge(ac, ans[j]) #acを後ろから累積した値に更新
+        ans[j] = adj_fin(merge(ME[j], TD[j]), j) #親方向からの伝搬値TD[j]と子方向からの伝搬値ME[j]で最終的な答えans[j]を更新
+print(*ans, sep = "\n")

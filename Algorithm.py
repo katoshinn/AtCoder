@@ -1306,3 +1306,16 @@ for i in R:
         ac = merge(ac, ans[j]) #acを後ろから累積した値に更新
         ans[j] = adj_fin(merge(ME[j], TD[j]), j) #親方向からの伝搬値TD[j]と子方向からの伝搬値ME[j]で最終的な答えans[j]を更新
 print(*ans, sep = "\n")
+
+#分割数列挙 for x in partition_of_int(N):print(x)
+def part_int_sub(n, k, a):
+  if n == 0: yield a
+  elif n == 1: yield a + [1]
+  elif k == 1: yield a + [1] * n
+  else:
+    if n >= k:
+      yield from part_int_sub(n-k, k, a+[k])
+    yield from part_int_sub(n, k-1, a)
+
+def partition_of_int(n):
+  yield from part_int_sub(n, n, [])

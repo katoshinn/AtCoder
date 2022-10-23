@@ -1319,3 +1319,13 @@ def part_int_sub(n, k, a):
 
 def partition_of_int(n):
   yield from part_int_sub(n, n, [])
+
+#設定した比較関数でソート
+from functools import cmp_to_key
+def cmp(a, b):
+    if a == b: return 0
+    return -1 if a < b else 1
+def cmpstr(a, b):
+    return cmp(str(a), str(b))
+xs = [4, 90, -9, 12, 42]
+print(sorted(xs, key=cmp_to_key(cmpstr)))

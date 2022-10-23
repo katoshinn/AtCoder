@@ -1328,4 +1328,4 @@ def cmp(a, b):
 def cmpstr(a, b):
     return cmp(str(a), str(b))
 xs = [4, 90, -9, 12, 42]
-print(sorted(xs, key=cmp_to_key(cmpstr)))
+xs.sort(key=cmp_to_key(cmpstr))

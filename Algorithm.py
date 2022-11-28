@@ -3,7 +3,7 @@ git config --global user.name "katonyonko"
 
 #再帰関数を書くとき
 import sys
-sys.setrecursionlimit(1000000)
+sys.setrecursionlimit(10**6)
 
 #n以下の素数を列挙(10**6くらいまでは高速に動く)
 import math
@@ -149,6 +149,8 @@ for v in p:
 p2 = itertools.product(l1, repeat=2) #こんな指定もできる
 
 #Union Find
+import sys
+sys.setrecursionlimit(10**6)
 class UnionFind():
   def __init__(self, n):
     self.n = n

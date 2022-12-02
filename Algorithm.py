@@ -1431,3 +1431,21 @@ def LCP(s, n, sa):
             h += 1
         lcp[rank[i] - 1] = h
     return lcp
+
+#スライド最小値
+from collections import deque
+def sliding_window(A,L):
+  """
+  A: 列のi番目の要素
+  L: 最小値を調べる長さ
+  """
+  ans = []
+  que = deque()
+  for i, a in enumerate(A):
+    while que and a <= que[-1][1]:
+      que.pop()
+    que.append((i, a))
+    ans.append(que[0][1])
+    if que and que[0][0] <= i+1-L:
+      que.popleft()
+  return ans[L-1:]

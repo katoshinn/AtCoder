@@ -342,9 +342,6 @@ class BIT:
             r -= r & -r
         return s
 
-#mod 3などの小さい素数でのコンビネーションの求め方
-https://atcoder.jp/contests/arc117/editorial/1113
-
 #Dijkstra
 from heapq import heappop,heappush
 def Dijkstra(G,s):
@@ -966,6 +963,20 @@ I=[pow(F[-1],mod-2,mod)]
 for i in range(N):
     I.append(I[-1]*(N-i)%mod)
 I=I[::-1]
+
+#Combination(modが素数ではなく、Nが小さくて全部求めておけば良いとき)
+#C[id(m,n)]でmCnが得られる
+def id(m,n):
+  return m*(m+1)//2+n
+C=[1]
+for i in range(N):
+  C.append(1)
+  for j in range(i):
+    C.append((C[i*(i+1)//2+j]+C[i*(i+1)//2+j+1])%M)
+  C.append(1)
+
+#mod 3などの小さい素数でのcombinationの求め方
+https://atcoder.jp/contests/arc117/editorial/1113
 
 #行列掃き出し法(Aはリスト、Nは桁数（Aのサイズではない）で、Aの要素を2進数表示したときに上の桁から掃き出しでまとめていく関数)
 #A=[2,3]であれば、2進表示で10, 11だが、10は残して2の位の1が被っている11については10とxorを取って01に変更する。

@@ -1460,3 +1460,21 @@ def sliding_window(A,L):
     if que and que[0][0] <= i+1-L:
       que.popleft()
   return ans[L-1:]
+
+#行列累乗
+def multi(a,b,mod):
+    m=0
+    while m**2<len(a): m+=1
+    return [sum([a[i//m*m+j]*b[j*m+i%m]%mod for j in range(m)])%mod for i in range(m**2)]
+def pow_mat(a,n,mod):
+    m=0
+    while m**2<len(a): m+=1
+    res=[1 if i%(m+1)==0 else 0 for i in range(m**2)]
+    #aが決まっている場合は以下のtmpの構成を外に出せばその分早くなる.
+    tmp=[a]
+    for i in range(59):
+      tmp.append(multi(tmp[-1],tmp[-1]))
+    #ここまで
+    for i in range(60):
+      if (n>>i)&1==1: res=multi(res,tmp[i],mod)
+    return res

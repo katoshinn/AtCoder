@@ -535,6 +535,20 @@ def ExtGCD(a, b):
         return g, x, y
     return a, 1, 0
 
+#mが素数と限らない場合にmod.mに置けるaの逆元（aとmが互いに素であることが必要十分条件）を求める関数
+def Inv(a,m):
+    return ExtGCD(a,m)[1]%m
+
+# 中国剰余定理。以下を満たすxを求める
+# x≡b1 (mod.m1)
+# x≡b2 (mod.m2)
+import math
+def Ch_Rem(b1,b2,m1,m2):
+    g,p,q=ExtGCD(m1,m2)
+    d=math.gcd(m1,m2)
+    lcm=m1*m2//d
+    return (b1+m1//d*(b2-b1)*p)%lcm
+
 # 円同士の交点 円1: 中心(x1,y1) 半径r1 と 円2: 中心(x2,y2) 半径r2 の2つの円の交点
 def CirclesCrossPoints(x1, y1, r1, x2, y2, r2):
     eps=10**(-6)
@@ -975,8 +989,136 @@ for i in range(N):
     C.append((C[i*(i+1)//2+j]+C[i*(i+1)//2+j+1])%M)
   C.append(1)
 
-#mod 3などの小さい素数でのcombinationの求め方
-https://atcoder.jp/contests/arc117/editorial/1113
+#lucasの定理により任意の整数Mに対しmod Mで二項係数を求めるクラス
+#BC=BinomiaCoeeficien(M)で定義した後BC(n,k)がnCkを返すようになる。
+class BinomialCoefficient:
+    def __init__(self, mod):
+        self.mod = mod
+        self.prime = self.prime_factorize(mod)
+        self.facs = []
+        self.invs = []
+        self.pows = []
+        self.factinvs = []
+        for p, c in self.prime:
+            pc = pow(p, c)
+            fac = [1] * pc
+            inv = [1] * pc
+            for i in range(1, pc):
+                k = i
+                if(i % p == 0):
+                    k = 1
+                fac[i] = fac[i - 1] * k % pc
+            inv[-1] = fac[-1]
+            for i in range(1, pc)[::-1]:
+                k = i
+                if(i % p == 0):
+                    k = 1
+                inv[i - 1] = inv[i] * k % pc
+            self.facs.append(fac)
+            self.invs.append(inv)
+            pw = [1]
+            while(pw[-1] * p != pc):
+                pw.append(pw[-1] * p)
+            self.pows.append(pw)
+
+    def prime_factorize(self, n):
+        prime = []
+        f = 2
+        while(f * f <= n):
+            if(n % f == 0):
+                n //= f
+                cnt = 1
+                while(n % f == 0):
+                    n //= f
+                    cnt += 1
+                prime.append((f, cnt))
+            f += 1
+        if(n != 1):
+            prime.append((n, 1))
+        return prime
+
+    def crt(self, rm):
+        r0 = 0
+        m0 = 1
+        for a, b in rm:
+            r1 = a % b
+            m1 = b
+            if(m0 < m1):
+                r0, r1, m0, m1 = r1, r0, m1, m0
+            if(m0 % m1 == 0):
+                if(r0 % m1 != r1):
+                    return 0, 0
+                continue
+            g, im = self.inv_gcd(m0, m1)
+            u1 = m1 // g
+            if((r1 - r0) % g):
+                return 0, 0
+            x = (r1 - r0) // g * im % u1
+            r0 += x * m0
+            m0 *= u1
+            if(r0 < 0):
+                r0 += m0
+        return r0, m0
+
+    def inv_gcd(self, n, m):
+        n %= m
+        if(n == 0):
+            return m, 0
+        s, t, m0, m1 = m, n, 0, 1
+        while(t):
+            u = s // t
+            s -= t * u
+            m0 -= m1 * u
+            m0, m1, s, t = m1, m0, t, s
+        if(m0 < 0):
+            m0 += m // s
+        return s, m0
+
+    def inv_mod(self, n, m):
+        g, im = self.inv_gcd(n, m)
+        return im
+
+    def calc_e(self, n, k, r, p):
+        e = 0
+        while(n):
+            n //= p
+            e += n
+        while(k):
+            k //= p
+            e -= k
+        while(r):
+            r //= p
+            e -= r
+        return e
+
+    def lucas(self, n, k, p, c, i):
+        pw = self.pows[i]
+        fac = self.facs[i]
+        inv = self.invs[i]
+        r = n - k
+        pc = pow(p, c)
+        e = self.calc_e(n, k, r, p)
+        if(e >= len(pw)):
+            return 0
+        ret = pw[e]
+        if((p != 2 or c < 3) and (self.calc_e(n // pw[-1], k // pw[-1], r // pw[-1], p) & 1)):
+            ret *= -1
+        while(n):
+            ret *= fac[n % pc] * inv[k % pc] * inv[r % pc] % pc
+            ret %= pc
+            n //= p
+            k //= p
+            r //= p
+        return ret
+
+    def __call__(self, n, k):
+        if(k < 0 or k > n):
+            return 0
+        if(k == 0 or k == n):
+            return 1
+        rm = [(self.lucas(n, k, p, c, i), pow(p, c)) for i, (p, c) in enumerate(self.prime)]
+        ret, _ = self.crt(rm)
+        return ret
 
 #行列掃き出し法(Aはリスト、Nは桁数（Aのサイズではない）で、Aの要素を2進数表示したときに上の桁から掃き出しでまとめていく関数)
 #A=[2,3]であれば、2進表示で10, 11だが、10は残して2の位の1が被っている11については10とxorを取って01に変更する。

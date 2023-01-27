@@ -97,19 +97,6 @@ def divisors(N):
           for r in ret_prev:
               ret.append(r * (p ** i))
   return sorted(ret)
-
-#約数全列挙
-def make_divisors(n):
-  lower_divisors , upper_divisors = [], []
-  i = 1
-  while i*i <= n:
-      if n % i == 0:
-          lower_divisors.append(i)
-          if i != n // i:
-              upper_divisors.append(n//i)
-      i += 1
-  return lower_divisors + upper_divisors[::-1]
-
 #numpyの高速化
 from numba import njit
 @njit(cache=True)

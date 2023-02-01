@@ -526,6 +526,15 @@ def ExtGCD(a, b):
 def Inv(a,m):
     return ExtGCD(a,m)[1]%m
 
+#0から100万までの逆元を全て求める方法
+MAX = 10**6+10
+MOD = 998244353
+inv = [0]*MAX
+inv[1] = 1
+ 
+for i in range(2, MAX):
+    inv[i] = MOD-inv[MOD%i]*(MOD//i)%MOD
+
 # 中国剰余定理。以下を満たすxを求める
 # x≡b1 (mod.m1)
 # x≡b2 (mod.m2)

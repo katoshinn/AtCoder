@@ -328,6 +328,9 @@ class BIT:
             s += self.data[r - 1]
             r -= r & -r
         return s
+    #pの位置をxという値にセット
+    def set(self, p, x):
+        self.add(p, -self.sum(p, p+1) + x)
 
 #Dijkstra
 from heapq import heappop,heappush

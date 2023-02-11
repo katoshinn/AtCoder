@@ -97,6 +97,7 @@ def divisors(N):
           for r in ret_prev:
               ret.append(r * (p ** i))
   return sorted(ret)
+  
 #numpyの高速化
 from numba import njit
 @njit(cache=True)

@@ -212,6 +212,9 @@ class SegTree:
             R >>= 1
         return self.X_f(vL, vR)
 
+    def get_val(self,idx):
+        return self.X[idx+self.N]
+
 #遅延セグ木 0-indexed、演算はmaxの例を書いているが、変更する場合はunitとclassmethodの部分を変える
 #https://maspypy.com/segment-tree-%e3%81%ae%e3%81%8a%e5%8b%89%e5%bc%b72 1-indexedと書かれているが、以下のコードは0-indexed
 class LazySegTree:

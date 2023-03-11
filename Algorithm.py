@@ -923,6 +923,29 @@ def bfs(G,s):
         dq.append(y)
   return D
 
+# 重心分解
+def cent_decomp(G,i):
+  D,parent,used=bfs(G,i)
+  size={key:1 for key in used}
+  stack=[(i,0)]
+  while stack:
+    x,d=stack.pop()
+    if d==0:
+      for v in G[x]:
+        if D[v]>D[x]:
+          stack.append((v,1))
+          stack.append((v,0))
+    else:
+      size[parent[x]]+=size[x]
+  res=[]
+  for i in used:
+    tmp=0
+    if len(used)-size[i]>len(used)//2: tmp=1
+    for v in G[i]:
+      if D[v]>D[i] and size[v]>len(used)//2: tmp=1
+    if tmp==0: res.append(i)
+  return res
+
 #01BFS Gは隣接頂点リストで、(隣接頂点,重み(0or1))が入っている
 from collections import deque
 def bfs01(G,s):

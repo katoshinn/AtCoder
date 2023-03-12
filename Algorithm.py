@@ -1190,11 +1190,15 @@ def z_algorithm(s):
         j -= k
     return Z_alg
 
-#10進数をn進数にする関数
+#10進数をn進数にする関数→リスト形式で、左から１の位、１０の位、という順番で数字が入る。
 def Base_10_to_n(X, n):
-    if (int(X/n)):
-        return Base_10_to_n(int(X/n), n)+str(X%n)
-    return str(X%n)
+  res=[]
+  d=1
+  while pow(n,d)<=X: d+=1
+  for i in range(d):
+    res.append(X//pow(n,d-1-i))
+    X%=pow(n,d-1-i)
+  return res[::-1]
 
 #Topological Sort DAGでない入力でも良いが、その場合は-1が出力される Gは行先を入れたグラフ
 from heapq import heappop,heappush

@@ -394,56 +394,61 @@ def EulerTour(G, s):
     return ET, left, right, depth, parent #(right-left+1)//2がその頂点を含む部分木の大きさ
 
 #LCA(最小共通祖先)ここは準備
-def EulerTour(G, s):
-    depth=[-1]*len(G)
-    depth[s]=0
-    done = [0]*len(G)
-    Q = [~s, s] # 根をスタックに追加
-    parent=[-1]*len(G)
-    ET = []
-    left=[-1]*len(G)
-    while Q:
-        i = Q.pop()
-        if i >= 0: # 行きがけの処理
-            done[i] = 1
-            if left[i]==-1: left[i]=len(ET)
-            ET.append(i)
-            for a in G[i][::-1]:
-                if done[a]: continue
-                depth[a]=depth[i]+1
-                parent[a]=i
-                Q.append(~a) # 帰りがけの処理をスタックに追加
-                Q.append(a) # 行きがけの処理をスタックに追加
-        else: # 帰りがけの処理
-            ET.append(parent[~i])
-    return ET[:-1], left, depth, parent
-S,F,depth,parent=EulerTour(G,0)
-INF = (len(G), None)
-M = 2*len(G)
-M0 = 2**(M-1).bit_length()
-data = [INF]*(2*M0)
-for i, v in enumerate(S):
-    data[M0-1+i] = (depth[v], i)
-for i in range(M0-2, -1, -1):
-    data[i] = min(data[2*i+1], data[2*i+2])
-#LCAの計算 (generatorで最小値を求める)
-def _query(a, b):
-    yield INF
-    a += M0; b += M0
-    while a < b:
-        if b & 1:
-            b -= 1
-            yield data[b-1]
-        if a & 1:
-            yield data[a-1]
-            a += 1
-        a >>= 1; b >>= 1
-# LCAの計算 (外から呼び出す関数)
-def LCA(u, v):
-    fu = F[u]; fv = F[v]
-    if fu > fv:
-        fu, fv = fv, fu
-    return S[min(_query(fu, fv+1))[1]]
+class LCA_Tree:
+    def __init__(self, G, s):
+        self.G=G
+        self.s=s
+
+        def EulerTour(G, s):
+            depth=[-1]*len(G)
+            depth[s]=0
+            done = [0]*len(G)
+            Q = [~s, s] # 根をスタックに追加
+            parent=[-1]*len(G)
+            ET = []
+            left=[-1]*len(G)
+            while Q:
+                i = Q.pop()
+                if i >= 0: # 行きがけの処理
+                    done[i] = 1
+                    if left[i]==-1: left[i]=len(ET)
+                    ET.append(i)
+                    for a in G[i][::-1]:
+                        if done[a]: continue
+                        depth[a]=depth[i]+1
+                        parent[a]=i
+                        Q.append(~a) # 帰りがけの処理をスタックに追加
+                        Q.append(a) # 行きがけの処理をスタックに追加
+                else: # 帰りがけの処理
+                    ET.append(parent[~i])
+            return ET[:-1], left, depth, parent
+        self.S,self.F,self.depth,self.parent=EulerTour(self.G,0)
+        self.INF = (len(self.G), None)
+        self.M = 2*len(self.G)
+        self.M0 = 2**(self.M-1).bit_length()
+        self.data = [self.INF]*(2*self.M0)
+        for i, v in enumerate(self.S):
+            self.data[self.M0-1+i] = (self.depth[v], i)
+        for i in range(self.M0-2, -1, -1):
+            self.data[i] = min(self.data[2*i+1], self.data[2*i+2])
+
+    #LCAの計算 (generatorで最小値を求める)
+    def LCA(self, u, v):
+        def _query(a, b):
+            yield self.INF
+            a += self.M0; b += self.M0
+            while a < b:
+                if b & 1:
+                    b -= 1
+                    yield self.data[b-1]
+                if a & 1:
+                    yield self.data[a-1]
+                    a += 1
+                a >>= 1; b >>= 1
+        fu = self.F[u]; fv = self.F[v]
+        if fu > fv:
+            fu, fv = fv, fu
+        return self.S[min(_query(fu, fv+1))[1]]
 
 #強連結成分分解
 #labels:強連結成分のラベル番号, lb_cnt:全強連結成分数, build:graphから強連結成分分解を実行, construct:強連結成分によるDAGと各成分の頂点リストのリストをこの順に抽出

@@ -1,33 +1,45 @@
-from urllib.request import urlopen
-from bs4 import BeautifulSoup
 import io
 import sys
 
-#ABCの回数
-times=""
-#問題
-problem=""
+_INPUT = """\
+6
+"""
 
- # 1. Get a html.
-with urlopen("https://atcoder.jp/contests/abc{0}/tasks/abc{0}_{1}".format(times, problem)) as res:
-  html = res.read().decode("utf-8")
-# 2. Load a html by BeautifulSoup.
-soup = BeautifulSoup(html, "html.parser")
-# 3. Get items you want.
-test_case = soup.select(".lang-ja pre")
-test_case =[t.text for t in test_case[1:]]
-x = '''
-'''
-y = '''
-'''
-additional_case = []
-test_case += additional_case
+def solve(test):
+  ans=[]
+  if test==0:
+    print(*[ans[i]+1 for i in range(M)])
+  else:
+    return [ans[i]+1 for i in range(M)]
 
-for __ in range(0,len(test_case),2):
-  sys.stdin = io.StringIO(test_case[__])
+def random_input():
+  from random import randint,shuffle
+  N=randint(1,10)
+  M=randint(1,N)
+  A=list(range(1,M+1))+[randint(1,M) for _ in range(N-M)]
+  shuffle(A)
+  return (" ".join(map(str, [N,M]))+"\n"+" ".join(map(str, A))+"\n")*3
 
-  """ここから下にコードを記述"""
-  
-  """ここから上にコードを記述"""
+def simple_solve():
+  return []
 
-  print(test_case[__+1])
+def main(test):
+  if test==0:
+    solve(0)
+  elif test==1:
+    sys.stdin = io.StringIO(_INPUT)
+    case_no=int(input())
+    for _ in range(case_no):
+      solve(0)
+  else:
+    for i in range(1000):
+      sys.stdin = io.StringIO(random_input())
+      x=solve(1)
+      y=simple_solve()
+      if x!=y:
+        print(i,x,y)
+        print(*[line for line in sys.stdin],sep='')
+        break
+
+#0:提出用、1:与えられたテスト用、2:ストレステスト用
+main(0)

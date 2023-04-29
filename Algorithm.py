@@ -1655,3 +1655,6 @@ def pow_mat(a,n,mod):
     for i in range(60):
       if (n>>i)&1==1: res=multi(res,tmp[i],mod)
     return res
+
+#ストレステスト含めたコード
+https://atcoder.jp/contests/abc299/submissions/41012908

@@ -6,11 +6,11 @@ _INPUT = """\
 """
 
 def solve(test):
-  ans=[]
+  ans=0
   if test==0:
-    print(*[ans[i]+1 for i in range(M)])
+    print(ans)
   else:
-    return [ans[i]+1 for i in range(M)]
+    return None
 
 def random_input():
   from random import randint,shuffle
@@ -42,4 +42,4 @@ def main(test):
         break
 
 #0:提出用、1:与えられたテスト用、2:ストレステスト用
-main(0)
+main(1)

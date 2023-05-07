@@ -393,7 +393,7 @@ def EulerTour(G, s):
       if ET[~i]<0 and right[~ET[~i]]==-1: right[~ET[~i]]=len(G)*2-i-1
     return ET, left, right, depth, parent #(right-left+1)//2がその頂点を含む部分木の大きさ
 
-#LCA(最小共通祖先)ここは準備
+#LCA(最小共通祖先)
 class LCA_Tree:
     def __init__(self, G, s):
         self.G=G

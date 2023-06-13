@@ -1639,22 +1639,27 @@ def sliding_window(A,L):
   return ans[L-1:]
 
 #行列累乗
-def multi(a,b,mod):
-    m=0
-    while m**2<len(a): m+=1
-    return [sum([a[i//m*m+j]*b[j*m+i%m]%mod for j in range(m)])%mod for i in range(m**2)]
-def pow_mat(a,n,mod):
-    m=0
-    while m**2<len(a): m+=1
-    res=[1 if i%(m+1)==0 else 0 for i in range(m**2)]
-    #aが決まっている場合は以下のtmpの構成を外に出せばその分早くなる.
-    tmp=[a]
-    for i in range(59):
-      tmp.append(multi(tmp[-1],tmp[-1]))
-    #ここまで
-    for i in range(60):
-      if (n>>i)&1==1: res=multi(res,tmp[i],mod)
+class MatMul:
+  def __init__(self, N, mod):
+    self.N = N
+    self.mod = mod
+  def idx(self,i,j): return i*self.N+j
+  def mult(self,A,B):
+    res=[]
+    for i in range(self.N):
+      for j in range(self.N):
+        res.append(sum([A[self.idx(i,k)]*B[self.idx(k,j)]%self.mod for k in range(self.N)])%self.mod)
     return res
-
-#ストレステスト含めたコード
-https://atcoder.jp/contests/abc299/submissions/41012908
+  def pow_mat(self,A,n):
+    tmp=[A]
+    m=n
+    while m>1:
+      tmp.append(self.mult(tmp[-1],tmp[-1]))
+      m//=2
+    res=[0]*self.N**2
+    for i in range(self.N):
+      res[self.idx(i,i)]=1
+    for i in range(len(tmp)):
+      if (n>>i)&1==1:
+        res=self.mult(res,tmp[i])
+    return res

@@ -1,5 +1,9 @@
 import io
 import sys
+from collections import defaultdict, deque
+from itertools import permutations, combinations, accumulate
+from heapq import heappush, heappop
+sys.setrecursionlimit(10**6)
 
 _INPUT = """\
 6

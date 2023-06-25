@@ -1,10 +1,13 @@
 import io
 import sys
 import pdb
-from collections import defaultdict, deque
+from collections import defaultdict, deque, Counter
 from itertools import permutations, combinations, accumulate
 from heapq import heappush, heappop
 sys.setrecursionlimit(10**6)
+from bisect import bisect_right, bisect_left
+from math import gcd
+import math
 
 _INPUT = """\
 6

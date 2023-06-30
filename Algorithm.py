@@ -1663,3 +1663,8 @@ class MatMul:
       if (n>>i)&1==1:
         res=self.mult(res,tmp[i])
     return res
+  def mat_vec(self,A,v):
+    res=[0]*self.N
+    for i in range(self.N):
+      res[i]=sum([A[self.idx(i,j)]*v[j]%self.mod for j in range(self.N)])%self.mod
+    return res

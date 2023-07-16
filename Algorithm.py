@@ -1663,3 +1663,85 @@ class MatMul:
       if (n>>i)&1==1:
         res=self.mult(res,tmp[i])
     return res
+  def mat_vec(self,A,v):
+    res=[0]*self.N
+    for i in range(self.N):
+      res[i]=sum([A[self.idx(i,j)]*v[j]%self.mod for j in range(self.N)])%self.mod
+    return res
+  
+#Binary Trie
+#この実装のmin_xorは一般的なTrieの変数とは異なるが、こういうこともできるという例（Trieに入っている２数のXORの最小値を求めている）
+#その他実装が足りないので、必要に応じて追加する（https://kazuma8128.hatenablog.com/entry/2018/05/06/022654）
+class BinaryTrie:
+    class node:
+        def __init__(self,val):
+            self.left = None
+            self.right = None
+            self.cnt = 0
+            self.min_xor = 1<<30
+            self.val = val
+ 
+    def __init__(self):
+        self.B = 30
+        self.root = self.node(1<<self.B)
+        
+ 
+    def append(self,val):
+        pos = self.root
+        stack = []
+        for b in range(self.B)[::-1]:
+            stack.append(pos) 
+            if val>>b & 1:
+                if pos.right is None:
+                    pos.right = self.node(val)
+                pos = pos.right
+            else:
+                if pos.left is None:
+                    pos.left = self.node(val)
+                pos = pos.left
+ 
+        pos.cnt = 1
+        pos.val = val
+        pos.min_xor = 1<<self.B
+        for pos in stack[::-1]:
+            pos.cnt = 0
+            if pos.left and pos.left.cnt:
+                pos.cnt += pos.left.cnt
+                pos.min_xor = min(pos.min_xor,pos.left.min_xor)
+                pos.val = pos.left.val
+            if pos.right and pos.right.cnt:
+                pos.cnt += pos.right.cnt
+                pos.min_xor = min(pos.min_xor,pos.right.min_xor)
+                pos.val = pos.right.val
+            if pos.left and pos.right and pos.left.cnt and pos.right.cnt:
+                pos.min_xor = min(pos.min_xor,pos.left.val ^ pos.right.val)
+    
+    def remove(self,val):
+        #print("remove",val)
+        pos = self.root
+        stack = []
+        for b in range(self.B)[::-1]:
+            stack.append(pos)
+            if val>>b & 1:
+                pos = pos.right
+            else:
+                pos = pos.left
+        
+        pos.cnt = 0
+        pos.val = -1
+        pos.min_xor = 1<<self.B
+        for pos in stack[::-1]:
+            pos.cnt = 0
+            pos.min_xor = 1<<30
+            if pos.left and pos.left.cnt:
+                pos.cnt += pos.left.cnt
+                pos.min_xor = min(pos.min_xor,pos.left.min_xor)
+                pos.val = pos.left.val
+            if pos.right and pos.right.cnt:
+                pos.cnt += pos.right.cnt
+                pos.min_xor = min(pos.min_xor,pos.right.min_xor)
+                pos.val = pos.right.val
+            if pos.left and pos.right and pos.left.cnt and pos.right.cnt:
+                pos.min_xor = min(pos.min_xor,pos.left.val ^ pos.right.val)
+            if pos.cnt == 0:
+                pos.val = -1

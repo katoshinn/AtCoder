@@ -1745,3 +1745,19 @@ class BinaryTrie:
                 pos.min_xor = min(pos.min_xor,pos.left.val ^ pos.right.val)
             if pos.cnt == 0:
                 pos.val = -1
+
+def cartesian_tree(a, cmp=lambda x,y: x < y):
+    n = len(a)
+    parent = [-1] * n
+    for i in range(1,n):
+        p = i-1  # parent of i
+        l = -1  # left child of i
+        while p != -1 and cmp(a[i], a[p]):
+            pp = parent[p]  # parent of parent of i
+            if l != -1:
+                parent[l] = p
+            parent[p] = i
+            l = p
+            p = pp
+        parent[i] = p
+    return parent

@@ -1516,7 +1516,6 @@ from collections import deque
 P = [-1] * N
 Q = deque([0])
 R = []
-W = [-100] * N
 while Q:
   i = deque.popleft(Q)
   R.append(i)

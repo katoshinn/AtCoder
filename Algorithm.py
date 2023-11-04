@@ -216,19 +216,23 @@ class SegTree:
         return self.X[idx+self.N]
 
 #遅延セグ木 0-indexed、演算はmaxの例を書いているが、変更する場合はunitとclassmethodの部分を変える
+#モノイドAがモノイドXに右作用する
 #https://maspypy.com/segment-tree-%e3%81%ae%e3%81%8a%e5%8b%89%e5%bc%b72 1-indexedと書かれているが、以下のコードは0-indexed
 class LazySegTree:
     X_unit = 0
     A_unit = 0
 
+    #作用を受ける側のモノイドの演算
     @classmethod
     def X_f(cls, x, y):
         return max(x,y)
 
+    #作用素の演算
     @classmethod
     def A_f(cls, x, y):
         return max(x,y)
 
+    #作用素の積が積の作用素になるように定義する
     @classmethod
     def operate(cls, x, y):
         return max(x,y)
@@ -263,6 +267,7 @@ class LazySegTree:
             i >>= 1
             self.X[i] = self.X_f(self._eval_at(i << 1), self._eval_at(i << 1 | 1))
 
+    #i番目の値をxに変更する
     def set_val(self, i, x):
         i += self.N
         self._propagate_above(i)
@@ -270,6 +275,7 @@ class LazySegTree:
         self.A[i] = self.A_unit
         self._recalc_above(i)
 
+    #LからR-1までの値の積を取る
     def fold(self, L, R):
         L += self.N
         R += self.N
@@ -288,6 +294,7 @@ class LazySegTree:
             R >>= 1
         return self.X_f(vL, vR)
 
+    #LからR-1までの値にxを作用させる
     def operate_range(self, L, R, x):
         L += self.N
         R += self.N

@@ -234,8 +234,8 @@ class LazySegTree:
 
     #作用素の積が積の作用素になるように定義する
     @classmethod
-    def operate(cls, x, y):
-        return max(x,y)
+    def operate(cls, x, a):
+        return max(x,a)
 
     def __init__(self, N):
         self.N = N

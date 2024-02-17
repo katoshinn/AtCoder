@@ -1828,53 +1828,51 @@ def cartesian_tree(a, cmp=lambda x,y: x < y):
     return parent
 
 #Merge Sort Tree
-#https://tjkendev.github.io/procon-library/python/range_query/merge-sort-tree.html
-from bisect import bisect
+#参考：https://tjkendev.github.io/procon-library/python/range_query/merge-sort-tree.html
+#data2関連を消せばカウントしかできなくなるが少し高速になる
+from itertools import accumulate
+from bisect import bisect_right
 from heapq import merge
-
-def construct(N, A):
-    N0 = 2**(N-1).bit_length()
-    data = [None]*(2*N0)
+class MergeSortTree:
+  def __init__(self, A):
+    self.N = len(A)
+    self.N0 = 2**(self.N-1).bit_length()
+    self.data = [None]*(2*self.N0)
+    self.data2 = [None]*(2*self.N0)
     for i, a in enumerate(A):
-        data[N0-1+i] = [a]
-    for i in range(N, N0):
-        data[N0-1+i] = []
-    for i in range(N0-2, -1, -1):
-        *data[i], = merge(data[2*i+1], data[2*i+2])
-    return N0, data
+      self.data[self.N0-1+i] = [a]
+      self.data2[self.N0-1+i] = [0, a]
+    for i in range(self.N, self.N0):
+      self.data[self.N0-1+i] = []
+      self.data2[self.N0-1+i] = [0]
+    for i in range(self.N0-2, -1, -1):
+      *self.data[i], = merge(self.data[2*i+1], self.data[2*i+2])
+      self.data2[i] = [0]+list(accumulate(self.data[i]))
 
-# count elements A_i s.t. A_i <= k for i in [l, r)
-def query1(N0, data, l, r, k):
-    L = l + N0; R = r + N0
-    s = 0
-    while L < R:
+  # count elements A_i s.t. A_i <= k for i in [l, r)
+  def count_query(self,l, r, k):
+      L = l + self.N0; R = r + self.N0
+      s = 0
+      while L < R:
         if R & 1:
-            R -= 1
-            s += bisect(data[R-1], k-1)
+          R -= 1
+          s += bisect_right(self.data[R-1], k)
         if L & 1:
-            s += bisect(data[L-1], k-1)
-            L += 1
+          s += bisect_right(self.data[L-1], k)
+          L += 1
         L >>= 1; R >>= 1
-    return s
-
-# count elements A_i s.t. a <= A_i < b for i in [l, r)
-def query(N0, data, l, r, a, b):
-    L = l + N0; R = r + N0
-    s = 0
-    while L < R:
+      return s
+  
+  # sum of elements A_i s.t. A_i <= k for i in [l, r)
+  def sum_query(self,l, r, k):
+      L = l + self.N0; R = r + self.N0
+      s = 0
+      while L < R:
         if R & 1:
-            R -= 1
-            s += bisect(data[R-1], b-1) - bisect(data[R-1], a-1)
+          R -= 1
+          s += self.data2[R-1][bisect_right(self.data[R-1], k)]
         if L & 1:
-            s += bisect(data[L-1], b-1) - bisect(data[L-1], a-1)
-            L += 1
+          s += self.data2[L-1][bisect_right(self.data[L-1], k)]
+          L += 1
         L >>= 1; R >>= 1
-    return s
-
-N = 6
-A = [6, 1, 4, 5, 3, 2]
-N0, data = construct(N, A)
-print(query1(N0, data, 2, 5, 4))
-# => "1"
-print(query(N0, data, 1, 4, 3, 5))
-# => "1"
+      return s

@@ -1996,3 +1996,170 @@ class LowLink:
             if self.visited[i]: continue
             self._dfs(i)
             self.component_num += 1
+
+# 重心分解
+class Centroid_decomposition:
+    def __init__(self, N: int, G: list[int]):
+        #頂点数N, 隣接リストGを渡す。重心分解を行う
+        #order[c]: 重心分解後の部分木における、重心cのDFS到達順
+        #          重心cの部分木は、orderが重心cよりも「大きい」BFSで移動可能な頂点
+        #depth[c]: 重心分解後の部分木における、重心cの深さ
+        #belong[c]: 重心分解後の部分木における、重心cの親となる重心(根の場合、-1)
+        #           belong[c]を再帰的にたどることで、頂点iが属する重心を列挙できる
+        self.N = N
+        self.logN = N.bit_length()
+        self.order = order = [-1] * N
+        self.depth = depth = [-1] * N
+        self.belong = belong = [-1] * N
+
+        #部分木の大きさを前計算
+        stack, size = [(0, -1)], [1] * N
+        for now, back in stack:
+            for nxt in G[now]:
+                if nxt != back:
+                    stack.append((nxt, now))
+        while stack:
+            now, back = stack.pop()
+            if back != -1:
+                size[back] += size[now]
+
+        #重心分解を実行
+        stack = [(0, -1, 0)]
+        for c in range(N):
+            now, back, d = stack.pop()
+
+            #1. 重心を探す
+            while True:
+                for nxt in G[now]:
+                    if order[nxt] == -1 and size[nxt] * 2 > size[now]:
+                        size[now], size[nxt], now = size[now] - size[nxt], size[now], nxt
+                        break
+                else:  #forループが完走 = 頂点nowが重心の場合
+                    break
+            
+            #2. 採番
+            order[now], depth[now], belong[now] = c, d, back
+
+            #3. 重心に隣接する頂点を再帰的に重心分解
+            if size[now] > 1:
+                for nxt in G[now]:
+                    if order[nxt] == -1:
+                        stack.append((nxt, now, d + 1))
+
+
+    #頂点u, vをどちらも含む、最も小さい部分木の重心を返す
+    def find(self, u: int, v: int):
+        du, dv = self.depth[u], self.depth[v]
+        for du in range(du - 1, dv - 1, -1):
+            u = self.belong[u]
+        for dv in range(dv - 1, du - 1, -1):
+            v = self.belong[v]
+        while u != v:
+            u, v = self.belong[u], self.belong[v]
+        return u
+
+    #頂点vが属する重心木を、サイズの昇順に列挙する
+    def get(self, v: int):
+        vertices = []
+        for d in range(self.depth[v], -1, -1):
+            vertices.append(v)
+            v = self.belong[v]
+        return vertices
+
+class AuxiliaryTree:
+    def __init__(self, n, edge, root=0):
+        self.n = n
+        self.edge = edge
+        self.eular = [-1] * (2 * n - 1)
+        self.first = [-1] * n
+        self.depth = [-1] * n
+        self.lgs = [0] * (2 * n)
+        for i in range(2, 2 * n):
+            self.lgs[i] = self.lgs[i >> 1] + 1
+        self.st = []
+        self.G = [[] for i in range(n)]  # 構築結果
+
+        self.dfs(root)
+        self.construct_sparse_table()
+
+    def dfs(self, root):
+        stc = [root]
+        self.depth[root] = 0
+        num = 0
+        while stc:
+            v = stc.pop()
+            if v >= 0:
+                self.eular[num] = v
+                self.first[v] = num
+                num += 1
+                for u in self.edge[v][::-1]:
+                    if self.depth[u] == -1:
+                        self.depth[u] = self.depth[v] + 1
+                        stc.append(~v)
+                        stc.append(u)
+            else:
+                self.eular[num] = ~v
+                num += 1
+
+    def construct_sparse_table(self):
+        self.st.append(self.eular)
+        sz = 1
+        while 2 * sz <= 2 * self.n - 1:
+            prev = self.st[-1]
+            nxt = [0] * (2 * self.n - 2 * sz)
+            for j in range(2 * self.n - 2 * sz):
+                v = prev[j]
+                u = prev[j + sz]
+                if self.depth[v] <= self.depth[u]:
+                    nxt[j] = v
+                else:
+                    nxt[j] = u
+            self.st.append(nxt)
+            sz *= 2
+
+    def lca(self, u, v):
+        x = self.first[u]
+        y = self.first[v]
+        # if x > y : x , y = y , x
+        d = self.lgs[y - x + 1]
+        return (
+            self.st[d][x]
+            if self.depth[self.st[d][x]] <= self.depth[self.st[d][y - (1 << d) + 1]]
+            else self.st[d][y - (1 << d) + 1]
+        )
+
+    def query(self, vs):
+        """
+        vs: 仮想木の頂点
+        self.G: 仮想木における子
+        返り値: 仮想木の根
+        """
+
+        k = len(vs)
+        if k == 0:
+            return -1
+        vs.sort(key=self.first.__getitem__)
+        stc = [vs[0]]
+        self.G[vs[0]] = []
+
+        for i in range(k - 1):
+            w = self.lca(vs[i], vs[i + 1])
+            if w != vs[i]:
+                last = stc.pop()
+                while stc and self.depth[w] < self.depth[stc[-1]]:
+                    self.G[stc[-1]].append(last)
+                    last = stc.pop()
+
+                if not stc or stc[-1] != w:
+                    stc.append(w)
+                    vs.append(w)
+                    self.G[w] = [last]
+                else:
+                    self.G[w].append(last)
+            stc.append(vs[i + 1])
+            self.G[vs[i + 1]] = []
+
+        for i in range(len(stc) - 1):
+            self.G[stc[i]].append(stc[i + 1])
+
+        return stc[0]
